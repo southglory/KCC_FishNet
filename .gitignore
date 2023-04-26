@@ -12,7 +12,7 @@
 !README.md
 !README.md.meta
 !.gitignore
-!/Assets/KinematicCharacterController/*
+!/Assets/KinematicCharacterController
 !/Packages/*
 !/ProjectSettings/*
 
