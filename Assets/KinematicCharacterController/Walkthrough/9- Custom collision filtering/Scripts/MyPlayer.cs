@@ -9,6 +9,9 @@ namespace KinematicCharacterController.Walkthrough.CollisionFiltering
 {
     public class MyPlayer : MonoBehaviour
     {
+        public bool isNewInputSystem;
+        private MyPlayerInputHandler9 localInput;
+
         public ExampleCharacterCamera OrbitCamera;
         public Transform CameraFollowPoint;
         public MyCharacterController Character;
@@ -27,22 +30,114 @@ namespace KinematicCharacterController.Walkthrough.CollisionFiltering
             OrbitCamera.SetFollowTransform(CameraFollowPoint);
 
             // Ignore the character's collider(s) for camera obstruction checks
-            OrbitCamera.IgnoredColliders = Character.GetComponentsInChildren<Collider>().ToList();
+            OrbitCamera.IgnoredColliders.Clear();
+            OrbitCamera.IgnoredColliders.AddRange(Character.GetComponentsInChildren<Collider>());
+
+            if (isNewInputSystem)
+            {
+                localInput = GetComponentInChildren<MyPlayerInputHandler9>();
+                localInput.enabled = true;
+            }
         }
 
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (isNewInputSystem)
             {
-                Cursor.lockState = CursorLockMode.Locked;
-            }
+                if (localInput.cameraLockSwitcher)
+                {
+                    Debug.Log("LeftButton");
+                    Cursor.lockState = CursorLockMode.Locked;
 
-            HandleCharacterInput();
+                    localInput.cameraLockSwitcher = false;
+                }
+                HandleCharacterNewInput();
+            }
+            else
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                }
+
+                HandleCharacterInput();
+            }
         }
 
         private void LateUpdate()
         {
-            HandleCameraInput();
+            if (isNewInputSystem)
+            {
+                HandleCameraNewInput();
+            }
+            else
+            {
+                HandleCameraInput();
+            }
+        }
+
+        private void HandleCameraNewInput()
+        {
+            // Create the look input vector for the camera
+            float mouseLookAxisUp = localInput.lookDelta.y;
+            float mouseLookAxisRight = localInput.lookDelta.x;
+            Vector3 lookInputVector = new Vector3(mouseLookAxisRight, mouseLookAxisUp, 0f);
+
+            // Prevent moving the camera while the cursor isn't locked
+            if (Cursor.lockState != CursorLockMode.Locked)
+            {
+                lookInputVector = Vector3.zero;
+            }
+
+            // Input for zooming the camera (disabled in WebGL because it can cause problems)
+            float scrollInput = -localInput.zoomScroll;
+#if UNITY_WEBGL
+        scrollInput = 0f;
+#endif
+
+            // Apply inputs to the camera
+            OrbitCamera.UpdateWithInput(Time.deltaTime, scrollInput, lookInputVector);
+
+            // Handle toggling zoom level
+            if (localInput.cameraModeSwitcher)
+            {
+                Debug.Log("RightButton");
+                OrbitCamera.TargetDistance = (OrbitCamera.TargetDistance == 0f) ? OrbitCamera.DefaultDistance : 0f;
+
+                localInput.cameraModeSwitcher = false;
+            }
+        }
+
+        private void HandleCharacterNewInput()
+        {
+            PlayerCharacterInputs characterInputs = new PlayerCharacterInputs();
+
+            // Build the CharacterInputs struct
+            characterInputs.MoveAxisForward = localInput.moving_Input.y;
+            characterInputs.MoveAxisRight = localInput.moving_Input.x;
+            characterInputs.CameraRotation = OrbitCamera.Transform.rotation;
+            characterInputs.JumpDown = localInput.jumping; localInput.jumping = false;
+
+
+
+            // Apply impulse
+            if (localInput.forced == true)
+            {
+                Debug.Log("forced");
+                Character.Motor.ForceUnground(0.1f);
+                Character.AddVelocity(Vector3.one * 10f);
+
+                localInput.forced = false;
+            }
+
+            characterInputs.CrouchDown = localInput.crouchingDown;
+            characterInputs.CrouchUp = !localInput.crouchingDown;
+
+            Debug.Log("characterInputs.CrouchDown:" + characterInputs.CrouchDown);
+            Debug.Log("characterInputs.CrouchUp:" + characterInputs.CrouchUp);
+
+            // Apply inputs to character
+            Character.SetInputs(ref characterInputs);
         }
 
         private void HandleCameraInput()
@@ -86,8 +181,18 @@ namespace KinematicCharacterController.Walkthrough.CollisionFiltering
             characterInputs.CrouchDown = Input.GetKeyDown(KeyCode.C);
             characterInputs.CrouchUp = Input.GetKeyUp(KeyCode.C);
 
+            // Apply impulse
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                Character.Motor.ForceUnground(0.1f);
+                Character.AddVelocity(Vector3.one * 10f);
+            }
+
             // Apply inputs to character
             Character.SetInputs(ref characterInputs);
+
+            Debug.Log("characterInputs.CrouchDown:" + characterInputs.CrouchDown);
+            Debug.Log("characterInputs.CrouchUp:" + characterInputs.CrouchUp);
         }
     }
 }

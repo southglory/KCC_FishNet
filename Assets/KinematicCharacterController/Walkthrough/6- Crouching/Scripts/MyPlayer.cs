@@ -180,6 +180,13 @@ namespace KinematicCharacterController.Walkthrough.Crouching
             characterInputs.CrouchDown = Input.GetKeyDown(KeyCode.C);
             characterInputs.CrouchUp = Input.GetKeyUp(KeyCode.C);
 
+            // Apply impulse
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                Character.Motor.ForceUnground(0.1f);
+                Character.AddVelocity(Vector3.one * 10f);
+            }
+
             // Apply inputs to character
             Character.SetInputs(ref characterInputs);
 
