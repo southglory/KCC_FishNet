@@ -8,6 +8,9 @@ namespace KinematicCharacterController.Examples
 {
     public class ExamplePlayer : MonoBehaviour
     {
+        public bool isNewInputSystem;
+        private MyPlayerInputHandler17 localInput;
+
         public ExampleCharacterController Character;
         public ExampleCharacterCamera CharacterCamera;
 
@@ -27,16 +30,33 @@ namespace KinematicCharacterController.Examples
             // Ignore the character's collider(s) for camera obstruction checks
             CharacterCamera.IgnoredColliders.Clear();
             CharacterCamera.IgnoredColliders.AddRange(Character.GetComponentsInChildren<Collider>());
+
+            if (isNewInputSystem)
+            {
+                localInput = GetComponentInChildren<MyPlayerInputHandler17>();
+                localInput.enabled = true;
+            }
         }
 
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (isNewInputSystem)
             {
-                Cursor.lockState = CursorLockMode.Locked;
+                if (localInput.cameraLockSwitcher)
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                }
+                HandleCharacterNewInput();
             }
+            else
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                }
 
-            HandleCharacterInput();
+                HandleCharacterInput();
+            }
         }
 
         private void LateUpdate()
@@ -48,7 +68,64 @@ namespace KinematicCharacterController.Examples
                 CharacterCamera.PlanarDirection = Vector3.ProjectOnPlane(CharacterCamera.PlanarDirection, Character.Motor.CharacterUp).normalized;
             }
 
-            HandleCameraInput();
+            if (isNewInputSystem)
+            {
+                HandleCameraNewInput();
+            }
+            else
+            {
+                HandleCameraInput();
+            }
+        }
+
+        private void HandleCameraNewInput()
+        {
+            // Create the look input vector for the camera
+            float mouseLookAxisUp = localInput.lookDelta.y;
+            float mouseLookAxisRight = localInput.lookDelta.x;
+            Vector3 lookInputVector = new Vector3(mouseLookAxisRight, mouseLookAxisUp, 0f);
+
+            // Prevent moving the camera while the cursor isn't locked
+            if (Cursor.lockState != CursorLockMode.Locked)
+            {
+                lookInputVector = Vector3.zero;
+            }
+
+            // Input for zooming the camera (disabled in WebGL because it can cause problems)
+            float scrollInput = -localInput.zoomScroll;
+#if UNITY_WEBGL
+        scrollInput = 0f;
+#endif
+
+            // Apply inputs to the camera
+            CharacterCamera.UpdateWithInput(Time.deltaTime, scrollInput, lookInputVector);
+
+            // Handle toggling zoom level
+            if (localInput.cameraModeSwitcher)
+            {
+                Debug.Log("RightButton");
+                CharacterCamera.TargetDistance = (CharacterCamera.TargetDistance == 0f) ? CharacterCamera.DefaultDistance : 0f;
+
+                localInput.cameraModeSwitcher = false;
+            }
+        }
+
+        private void HandleCharacterNewInput()
+        {
+            PlayerCharacterInputs characterInputs = new PlayerCharacterInputs();
+
+            // Build the CharacterInputs struct
+            characterInputs.MoveAxisForward = localInput.moving_Input.y;
+            characterInputs.MoveAxisRight = localInput.moving_Input.x;
+            characterInputs.CameraRotation = CharacterCamera.Transform.rotation;
+            characterInputs.JumpDown = localInput.jumping; localInput.jumping = false;
+
+            characterInputs.CrouchDown = localInput.crouchingDown;
+            characterInputs.CrouchUp = !localInput.crouchingDown;
+
+
+            // Apply inputs to character
+            Character.SetInputs(ref characterInputs);
         }
 
         private void HandleCameraInput()
