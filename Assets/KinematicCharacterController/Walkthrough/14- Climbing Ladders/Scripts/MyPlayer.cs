@@ -9,6 +9,9 @@ namespace KinematicCharacterController.Walkthrough.ClimbingLadders
 {
     public class MyPlayer : MonoBehaviour
     {
+        public bool isNewInputSystem;
+        private MyPlayerInputHandler14 localInput;
+
         public ExampleCharacterCamera OrbitCamera;
         public Transform CameraFollowPoint;
         public MyCharacterController Character;
@@ -29,21 +32,96 @@ namespace KinematicCharacterController.Walkthrough.ClimbingLadders
             // Ignore the character's collider(s) for camera obstruction checks
             OrbitCamera.IgnoredColliders.Clear();
             OrbitCamera.IgnoredColliders.AddRange(Character.GetComponentsInChildren<Collider>());
+
+            if (isNewInputSystem)
+            {
+                localInput = GetComponentInChildren<MyPlayerInputHandler14>();
+                localInput.enabled = true;
+            }
         }
 
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (isNewInputSystem)
             {
-                Cursor.lockState = CursorLockMode.Locked;
+                if (localInput.cameraLockSwitcher)
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                }
+                HandleCharacterNewInput();
             }
+            else
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                }
 
-            HandleCharacterInput();
+                HandleCharacterInput();
+            }
         }
 
         private void LateUpdate()
         {
-            HandleCameraInput();
+            if (isNewInputSystem)
+            {
+                HandleCameraNewInput();
+            }
+            else
+            {
+                HandleCameraInput();
+            }
+        }
+
+        private void HandleCameraNewInput()
+        {
+            // Create the look input vector for the camera
+            float mouseLookAxisUp = localInput.lookDelta.y;
+            float mouseLookAxisRight = localInput.lookDelta.x;
+            Vector3 lookInputVector = new Vector3(mouseLookAxisRight, mouseLookAxisUp, 0f);
+
+            // Prevent moving the camera while the cursor isn't locked
+            if (Cursor.lockState != CursorLockMode.Locked)
+            {
+                lookInputVector = Vector3.zero;
+            }
+
+            // Input for zooming the camera (disabled in WebGL because it can cause problems)
+            float scrollInput = -localInput.zoomScroll;
+#if UNITY_WEBGL
+        scrollInput = 0f;
+#endif
+
+            // Apply inputs to the camera
+            OrbitCamera.UpdateWithInput(Time.deltaTime, scrollInput, lookInputVector);
+
+            // Handle toggling zoom level
+            if (localInput.cameraModeSwitcher)
+            {
+                Debug.Log("RightButton");
+                OrbitCamera.TargetDistance = (OrbitCamera.TargetDistance == 0f) ? OrbitCamera.DefaultDistance : 0f;
+
+                localInput.cameraModeSwitcher = false;
+            }
+        }
+
+        private void HandleCharacterNewInput()
+        {
+            PlayerCharacterInputs characterInputs = new PlayerCharacterInputs();
+
+            // Build the CharacterInputs struct
+            characterInputs.MoveAxisForward = localInput.moving_Input.y;
+            characterInputs.MoveAxisRight = localInput.moving_Input.x;
+            characterInputs.CameraRotation = OrbitCamera.Transform.rotation;
+            characterInputs.JumpDown = localInput.jumping; localInput.jumping = false;
+
+            characterInputs.CrouchDown = localInput.crouchingDown;
+            characterInputs.CrouchUp = !localInput.crouchingDown;
+
+            characterInputs.ClimbLadder = localInput.climbingLadder; localInput.climbingLadder = false;
+
+            // Apply inputs to character
+            Character.SetInputs(ref characterInputs);
         }
 
         private void HandleCameraInput()
