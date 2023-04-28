@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace KinematicCharacterController.Examples
+namespace KinematicCharacterController.Offline
 {
-    public class ExampleCharacterCamera : MonoBehaviour
+    public class OfflineCharacterCamera : MonoBehaviour
     {
         [Header("Framing")]
         public Camera Camera;

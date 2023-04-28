@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
-using KinematicCharacterController.Examples;
 
-namespace KinematicCharacterController.Examples
+namespace KinematicCharacterController.Offline
 {
-    public class ExamplePlayer : MonoBehaviour
+    public class OfflinePlayer : MonoBehaviour
     {
+        // Ramyun: New input system member
         public bool isNewInputSystem;
-        private MyPlayerInputHandler17 localInput;
+        private OfflinePlayerInputHandler localInput;
 
-        public ExampleCharacterController Character;
-        public ExampleCharacterCamera CharacterCamera;
+        public OfflineCharacterController Character;
+        public OfflineCharacterCamera CharacterCamera;
 
+        // Ramyun: Old input system member
         private const string MouseXInput = "Mouse X";
         private const string MouseYInput = "Mouse Y";
         private const string MouseScrollInput = "Mouse ScrollWheel";
@@ -33,7 +34,7 @@ namespace KinematicCharacterController.Examples
 
             if (isNewInputSystem)
             {
-                localInput = GetComponentInChildren<MyPlayerInputHandler17>();
+                localInput = GetComponentInChildren<OfflinePlayerInputHandler>();
                 localInput.enabled = true;
             }
         }

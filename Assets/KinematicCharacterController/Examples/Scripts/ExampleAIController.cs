@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using KinematicCharacterController.Offline;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace KinematicCharacterController.Examples
     public class ExampleAIController : MonoBehaviour
     {
         public float MovementPeriod = 1f;
-        public List<ExampleCharacterController> Characters = new List<ExampleCharacterController>();
+        public List<OfflineCharacterController> Characters = new List<OfflineCharacterController>();
 
         private bool _stepHandling;
         private bool _ledgeHandling;

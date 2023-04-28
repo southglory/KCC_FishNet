@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using KinematicCharacterController.Offline;
 
 namespace KinematicCharacterController.Examples
 {
@@ -14,7 +15,7 @@ namespace KinematicCharacterController.Examples
         public Image RenderOn;
         public Image SimOn;
         public Image InterpOn;
-        public ExampleCharacterController CharacterPrefab;
+        public OfflineCharacterController CharacterPrefab;
         public ExampleAIController AIController;
         public int SpawnCount = 100;
         public float SpawnDistance = 2f;
@@ -93,7 +94,7 @@ namespace KinematicCharacterController.Examples
                 int col = i % charsPerRow;
                 Vector3 pos = firstPos + (Vector3.right * row * SpawnDistance) + (Vector3.forward * col * SpawnDistance);
 
-                ExampleCharacterController newChar = Instantiate(CharacterPrefab);
+                OfflineCharacterController newChar = Instantiate(CharacterPrefab);
                 newChar.Motor.SetPosition(pos);
 
                 AIController.Characters.Add(newChar);

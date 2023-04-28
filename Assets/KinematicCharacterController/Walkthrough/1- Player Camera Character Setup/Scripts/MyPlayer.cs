@@ -1,5 +1,5 @@
 using UnityEngine;
-using KinematicCharacterController.Examples;
+using KinematicCharacterController.Offline;
 using System.Linq;
 using UnityEngine.InputSystem;
 
@@ -11,7 +11,7 @@ namespace KinematicCharacterController.Walkthrough.PlayerCameraCharacterSetup
         public bool isNewInputSystem;
         private MyPlayerInputHandler1 localInput;
 
-        public ExampleCharacterCamera OrbitCamera;
+        public OfflineCharacterCamera OrbitCamera;
         public Transform CameraFollowPoint;
         public MyCharacterController Character;
         

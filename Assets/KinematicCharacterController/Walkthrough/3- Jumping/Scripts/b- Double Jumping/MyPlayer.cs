@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
-using KinematicCharacterController.Examples;
+using KinematicCharacterController.Offline;
 
 namespace KinematicCharacterController.Walkthrough.DoubleJumping
 {
     public class MyPlayer : MonoBehaviour
     {
-        public ExampleCharacterCamera OrbitCamera;
+        public OfflineCharacterCamera OrbitCamera;
         public Transform CameraFollowPoint;
         public MyCharacterController Character;
 

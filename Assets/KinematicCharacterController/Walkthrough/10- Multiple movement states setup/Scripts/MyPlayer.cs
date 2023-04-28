@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
-using KinematicCharacterController.Examples;
+using KinematicCharacterController.Offline;
 using System.Linq;
 
 namespace KinematicCharacterController.Walkthrough.MultipleMovementStates
@@ -12,7 +12,7 @@ namespace KinematicCharacterController.Walkthrough.MultipleMovementStates
         public bool isNewInputSystem;
         private MyPlayerInputHandler10 localInput;
 
-        public ExampleCharacterCamera OrbitCamera;
+        public OfflineCharacterCamera OrbitCamera;
         public Transform CameraFollowPoint;
         public MyCharacterController Character;
 

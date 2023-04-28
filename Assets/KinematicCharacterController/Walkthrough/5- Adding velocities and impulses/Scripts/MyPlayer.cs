@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
-using KinematicCharacterController.Examples;
+using KinematicCharacterController.Offline;
 
 namespace KinematicCharacterController.Walkthrough.AddingImpulses
 {
@@ -11,7 +11,7 @@ namespace KinematicCharacterController.Walkthrough.AddingImpulses
         public bool isNewInputSystem;
         private MyPlayerInputHandler5 localInput;
 
-        public ExampleCharacterCamera OrbitCamera;
+        public OfflineCharacterCamera OrbitCamera;
         public Transform CameraFollowPoint;
         public MyCharacterController Character;
 

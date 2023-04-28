@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
-using KinematicCharacterController.Examples;
+using KinematicCharacterController.Offline;
 using System.Linq;
 
 namespace KinematicCharacterController.Walkthrough.FramePerfectRotation
@@ -12,7 +12,7 @@ namespace KinematicCharacterController.Walkthrough.FramePerfectRotation
         public bool isNewInputSystem;
         private MyPlayerInputHandler16 localInput;
 
-        public ExampleCharacterCamera OrbitCamera;
+        public OfflineCharacterCamera OrbitCamera;
         public Transform CameraFollowPoint;
         public MyCharacterController Character;
 

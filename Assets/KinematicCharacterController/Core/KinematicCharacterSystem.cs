@@ -119,6 +119,18 @@ namespace KinematicCharacterController
         private void Awake()
         {
             _instance = this;
+
+            //Quang: Subscribe for tick update
+            InstanceFinder.TimeManager.OnTick += TimeManager_OnTick;
+        }
+
+        private void OnDestroy()
+        {
+            //Quang: UnSubscribe for tick update
+            if (InstanceFinder.TimeManager != null)
+            {
+                InstanceFinder.TimeManager.OnTick -= TimeManager_OnTick;
+            }
         }
 
         private void FixedUpdate()
@@ -126,6 +138,28 @@ namespace KinematicCharacterController
             if (Settings.AutoSimulation)
             {
                 float deltaTime = Time.deltaTime;
+
+                if (Settings.Interpolate)
+                {
+                    PreSimulationInterpolationUpdate(deltaTime);
+                }
+
+                Simulate(deltaTime, CharacterMotors, PhysicsMovers);
+
+                if (Settings.Interpolate)
+                {
+                    PostSimulationInterpolationUpdate(deltaTime);
+                }
+            }
+        }
+
+        //Quang: Because autoSimulation is Disable so we have to manually call Simulate every tick,
+        // Importance: Do not Simulate every tick in character controller or motor, it will be called many time when having many player!
+        private void TimeManager_OnTick()
+        {
+            if (!Settings.AutoSimulation)
+            {
+                float deltaTime = (float)InstanceFinder.TimeManager.TickDelta;
 
                 if (Settings.Interpolate)
                 {
@@ -175,6 +209,24 @@ namespace KinematicCharacterController
                 mover.Transform.SetPositionAndRotation(mover.TransientPosition, mover.TransientRotation);
                 mover.Rigidbody.position = mover.TransientPosition;
                 mover.Rigidbody.rotation = mover.TransientRotation;
+            }
+        }
+
+        /// <summary>
+        /// Quang: Call simulate manually, using in replicate method when replaying(reconciling)
+        /// </summary>
+        public static void SimulateThisTick(float deltaTime)
+        {
+            if (Settings.Interpolate)
+            {
+                PreSimulationInterpolationUpdate(deltaTime);
+            }
+
+            Simulate(deltaTime, CharacterMotors, PhysicsMovers);
+
+            if (Settings.Interpolate)
+            {
+                PostSimulationInterpolationUpdate(deltaTime);
             }
         }
 

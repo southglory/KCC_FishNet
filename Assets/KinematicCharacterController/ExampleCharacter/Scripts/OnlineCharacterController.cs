@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
 using System;
+using FishNet.Object.Prediction;
 
-namespace KinematicCharacterController.Examples
+namespace KinematicCharacterController.Online
 {
     public enum CharacterState
     {
@@ -17,7 +18,8 @@ namespace KinematicCharacterController.Examples
         TowardsMovement,
     }
 
-    public struct PlayerCharacterInputs
+    // Ramyun: ReplicateData
+    public struct PlayerCharacterInputs : IReplicateData
     {
         public float MoveAxisForward;
         public float MoveAxisRight;
@@ -25,6 +27,11 @@ namespace KinematicCharacterController.Examples
         public bool JumpDown;
         public bool CrouchDown;
         public bool CrouchUp;
+
+        private uint _tick;
+        public void Dispose() { }
+        public uint GetTick() => _tick;
+        public void SetTick(uint value) => _tick = value;
     }
 
     public struct AICharacterInputs
@@ -40,7 +47,7 @@ namespace KinematicCharacterController.Examples
         TowardsGroundSlopeAndGravity,
     }
 
-    public class ExampleCharacterController : MonoBehaviour, ICharacterController
+    public class OnlineCharacterController : MonoBehaviour, ICharacterController
     {
         public KinematicCharacterMotor Motor;
 

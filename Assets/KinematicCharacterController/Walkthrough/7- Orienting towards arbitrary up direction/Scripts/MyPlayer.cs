@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
-using KinematicCharacterController.Examples;
+using KinematicCharacterController.Offline;
 using System.Linq;
 
 namespace KinematicCharacterController.Walkthrough.OrientingArbitraryDirection
@@ -12,7 +12,7 @@ namespace KinematicCharacterController.Walkthrough.OrientingArbitraryDirection
         public bool isNewInputSystem;
         private MyPlayerInputHandler7 localInput;
 
-        public ExampleCharacterCamera OrbitCamera;
+        public OfflineCharacterCamera OrbitCamera;
         public Transform CameraFollowPoint;
         public MyCharacterController Character;
 
